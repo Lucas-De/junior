@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
   const client = await db.connect();
   try {
     client.sql`BEGIN`;
+
     await createBookmark(
       body.text,
       body.transcriptQaId,
@@ -98,6 +99,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({}, { status: 201 });
   } catch (e) {
     client.sql`ROLLBACK`;
+
+    /**
+     * Ideally we could query relations
+     * and respond with 404 if a directory or transcript isnt found.
+     * Decided not to focus too much on error handling
+     * so now we get 500 errors relation doesn't exist
+     * **/
     return NextResponse.json({}, { status: 500 });
   }
 }
