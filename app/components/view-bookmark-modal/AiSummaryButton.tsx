@@ -15,9 +15,10 @@ import { BsStars } from "react-icons/bs";
 
 interface Props {
   transcriptId: number;
+  disabled?: boolean;
 }
 
-export default function AiSummaryButton({ transcriptId }: Props) {
+export default function AiSummaryButton({ transcriptId, disabled }: Props) {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["summary", transcriptId],
     queryFn: () => fetchBookmarksSummary(transcriptId),
@@ -34,6 +35,7 @@ export default function AiSummaryButton({ transcriptId }: Props) {
           aria-label={"Summarize"}
           isLoading={isLoading}
           onClick={() => refetch()}
+          isDisabled={disabled}
         />
       </PopoverTrigger>
 

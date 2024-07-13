@@ -18,9 +18,8 @@ import { useQuery } from "@tanstack/react-query";
 import BookmarkDirectoryListItem from "./BookmarkDirectoryListItem";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import { ChangeEvent, useCallback, useState } from "react";
-import _ from "lodash";
-import { BsStars } from "react-icons/bs";
-import SummaryTooltip from "./AiSummaryButton";
+import _, { isEmpty } from "lodash";
+
 import AiSummaryButton from "./AiSummaryButton";
 
 interface Props {
@@ -44,6 +43,8 @@ export default function BookmarkModal(props: Props) {
     staleTime: 0, //no caching for now
     retry: false,
   });
+
+  const isEmpty = !directories?.length;
 
   const exportCsv = () => {
     if (!directories) return;
@@ -76,7 +77,10 @@ export default function BookmarkModal(props: Props) {
           <div>Bookmarks</div>
           <Flex justify="center" align="center" h="100%" gap={2} mt={4}>
             <Input placeholder="Search" onChange={debounceSearch} />
-            <AiSummaryButton transcriptId={+props.transcriptId} />
+            <AiSummaryButton
+              transcriptId={+props.transcriptId}
+              disabled={isEmpty}
+            />
           </Flex>
         </ModalHeader>
         <ModalCloseButton />
@@ -102,7 +106,7 @@ export default function BookmarkModal(props: Props) {
           <Button
             variant="ghost"
             size="sm"
-            disabled={!directories}
+            isDisabled={isEmpty}
             onClick={exportCsv}
           >
             Export to CSV
