@@ -21,8 +21,10 @@ export async function GET(req: NextRequest, { params }: GetDirectoriesParams) {
 
   const bookmarkTexts = JSON.stringify(rows.map((row) => row.text));
   const summary = await prompt(
-    `Summarize the following bookmarks in ~100 chars: ${bookmarkTexts}`
+    `Answer with only a summary of the following bookmarks in ~100 chars: ${bookmarkTexts}`
   );
+
+  console.log();
 
   return NextResponse.json({ summary }, { status: 200 });
 }
