@@ -27,6 +27,7 @@ const Home = () => {
     null
   );
   const [loading, setLoading] = useState(false);
+  const [isCreatingBookMark, setIsCreatingBookmark] = useState(false);
   const [bookmarkModalId, setBookmarkModalId] = useState<string | null>(null);
   const [selectedText, setSelectedText] = useState<SelectedTextState | null>(
     null
@@ -38,14 +39,21 @@ const Home = () => {
     if (selection) setSelectedText({ quote, selection });
   };
 
-  //reset text selection when user clicks somewhere  on page
   const handleSelectionChange = () => {
+    if (isCreatingBookMark) return;
     const selection = window.getSelection()?.toString();
     if (!selection) setSelectedText(null);
   };
 
   useEffect(() => {
-    // document.addEventListener("mouseup", handleSelectionChange);
+    //reset text selection when user moves mouse, a bit hacky and not bulletproof but ok for a demo
+    document.addEventListener("mousemove", handleSelectionChange);
+    return () => {
+      document.removeEventListener("mousemove", handleSelectionChange);
+    };
+  }, [isCreatingBookMark]);
+
+  useEffect(() => {
     setLoading(true);
     fetchTranscript()
       .then((data) => {
@@ -53,10 +61,6 @@ const Home = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-
-    return () => {
-      // document.removeEventListener("mouseup", handleSelectionChange);
-    };
   }, []);
 
   return (
@@ -142,10 +146,11 @@ const Home = () => {
                   align="stretch"
                   borderWidth={1}
                   borderRadius="md"
-                  spacing={4}
-                  p={6}
+                  spacing={2}
+                  p={8}
                   bg="gray.100"
                   boxShadow="sm"
+                  position="relative"
                 >
                   <Text
                     fontWeight="bold"
@@ -154,11 +159,6 @@ const Home = () => {
                     display="inline"
                   >
                     {quote.question}{" "}
-                    <CreateBookmarkButton
-                      quote={selectedText?.quote}
-                      text={selectedText?.selection}
-                      visible={selectedText?.quote.id == quote.id}
-                    />
                   </Text>
                   <Text
                     fontSize="md"
@@ -167,6 +167,12 @@ const Home = () => {
                   >
                     {quote.answer}
                   </Text>
+                  <CreateBookmarkButton
+                    onToggleModal={(active) => setIsCreatingBookmark(active)}
+                    quote={selectedText?.quote}
+                    text={selectedText?.selection}
+                    visible={selectedText?.quote.id == quote.id}
+                  />
                 </VStack>
               ))}
             </VStack>
