@@ -25,7 +25,7 @@ export default function BookmarkDirectoryListItem({ directory }: Props) {
         </Text>
       </Flex>
       {isOpen && (
-        <VStack align="stretch" gap={5}>
+        <VStack align="stretch" gap={2}>
           {directory.bookmarks.map((bookmark) => (
             <BookmarkListItem bookmark={bookmark} key={bookmark.id} />
           ))}

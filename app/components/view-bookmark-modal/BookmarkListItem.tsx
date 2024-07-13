@@ -17,7 +17,7 @@ export default function BookmarkListItem({ bookmark }: Props) {
       bg="gray.100"
       boxShadow="sm"
     >
-      <Text fontSize="medium">&quot;{bookmark.quote}&quot;</Text>
+      <Text fontSize="medium">“{bookmark.text}”</Text>
       <Text fontSize="smaller" color="gray.500">
         {bookmark.question}
       </Text>

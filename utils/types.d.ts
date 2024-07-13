@@ -6,7 +6,7 @@ export interface BookmarkDirectory {
 
 export interface Bookmark {
   id: string;
-  quote: string;
+  text: string;
   question: string;
 }
 

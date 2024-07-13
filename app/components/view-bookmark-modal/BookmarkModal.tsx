@@ -37,7 +37,7 @@ export default function BookmarkModal(props: Props) {
   const { data: directories, isLoading } = useQuery({
     queryKey: ["bookmarks", props.transcriptId, searchQuery],
     queryFn: () => fetchBookmarks(props.transcriptId, searchQuery),
-    staleTime: 1000 * 50,
+    staleTime: 0, //no caching for now
     retry: false,
   });
 
@@ -49,7 +49,7 @@ export default function BookmarkModal(props: Props) {
         ...rows,
         ...dir.bookmarks.map((b) => ({
           directory: dir.name,
-          quote: b.quote,
+          text: b.text,
           question: b.question,
         })),
       ],

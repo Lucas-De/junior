@@ -9,7 +9,7 @@ const seedDb = async ({ reset = false }: { reset?: boolean }) => {
   if (reset) {
     console.log("Resetting database");
     await sql`DROP TABLE IF EXISTS bookmark`;
-    await sql`DROP TABLE IF EXISTS bookmark_dir`;
+    await sql`DROP TABLE IF EXISTS bookmark_directory`;
     await sql`DROP TABLE IF EXISTS transcript_question_answer`;
     await sql`DROP TABLE IF EXISTS transcript`;
 
@@ -32,7 +32,9 @@ const seedDb = async ({ reset = false }: { reset?: boolean }) => {
     await sql`
       CREATE TABLE bookmark_directory (
         id SERIAL PRIMARY KEY,
-        name TEXT
+        name TEXT,
+        transcript_id INT, 
+        FOREIGN KEY(transcript_id) REFERENCES transcript(id) ON DELETE CASCADE
       );`;
 
     await sql`
@@ -40,7 +42,7 @@ const seedDb = async ({ reset = false }: { reset?: boolean }) => {
         id SERIAL PRIMARY KEY,
         transcript_question_answer_id INTEGER,
         bookmark_directory_id INTEGER,
-        quote TEXT,
+        text TEXT,
         FOREIGN KEY(transcript_question_answer_id) REFERENCES transcript_question_answer(id) ON DELETE CASCADE,
         FOREIGN KEY(bookmark_directory_id) REFERENCES bookmark_directory(id)
       );`;

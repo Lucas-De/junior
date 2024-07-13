@@ -12,9 +12,15 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { fetchTranscript } from "@/utils/api";
-import { TranscriptWithQA } from "@/utils/types";
+import { TranscriptQA, TranscriptWithQA } from "@/utils/types";
 import { BsBookmark } from "react-icons/bs";
-import BookmarkModal from "./components/BookmarkModal";
+import CreateBookmarkButton from "./components/CreateBookmarkButton";
+import BookmarkModal from "./components/view-bookmark-modal/BookmarkModal";
+
+interface SelectedTextState {
+  quote: TranscriptQA;
+  selection: string;
+}
 
 const Home = () => {
   const [transcripts, setTranscripts] = useState<TranscriptWithQA[] | null>(
@@ -22,8 +28,24 @@ const Home = () => {
   );
   const [loading, setLoading] = useState(false);
   const [bookmarkModalId, setBookmarkModalId] = useState<string | null>(null);
+  const [selectedText, setSelectedText] = useState<SelectedTextState | null>(
+    null
+  );
+
+  //save text selection when user highlights quote substring
+  const captureQuoteSelection = (quote: TranscriptQA) => {
+    const selection = window.getSelection()?.toString();
+    if (selection) setSelectedText({ quote, selection });
+  };
+
+  //reset text selection when user clicks somewhere  on page
+  const handleSelectionChange = () => {
+    const selection = window.getSelection()?.toString();
+    if (!selection) setSelectedText(null);
+  };
 
   useEffect(() => {
+    // document.addEventListener("mouseup", handleSelectionChange);
     setLoading(true);
     fetchTranscript()
       .then((data) => {
@@ -31,6 +53,10 @@ const Home = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    return () => {
+      // document.removeEventListener("mouseup", handleSelectionChange);
+    };
   }, []);
 
   return (
@@ -78,6 +104,7 @@ const Home = () => {
         )}
 
         {loading && <Box>Loading...</Box>}
+
         {transcripts?.map(({ transcript, quotes }) => (
           <Box
             id={transcript.id}
@@ -101,7 +128,7 @@ const Home = () => {
               <Button
                 variant="ghost"
                 size="xs"
-                leftIcon={<BsBookmark />}
+                leftIcon={<BsBookmark fontWeight={900} />}
                 onClick={() => setBookmarkModalId(transcript.id)}
               >
                 View Bookmarks
@@ -120,10 +147,24 @@ const Home = () => {
                   bg="gray.100"
                   boxShadow="sm"
                 >
-                  <Text fontWeight="bold" fontSize="lg" color="teal.700">
-                    {quote.question}
+                  <Text
+                    fontWeight="bold"
+                    fontSize="lg"
+                    color="teal.700"
+                    display="inline"
+                  >
+                    {quote.question}{" "}
+                    <CreateBookmarkButton
+                      quote={selectedText?.quote}
+                      text={selectedText?.selection}
+                      visible={selectedText?.quote.id == quote.id}
+                    />
                   </Text>
-                  <Text fontSize="md" color="gray.800">
+                  <Text
+                    fontSize="md"
+                    color="gray.800"
+                    onMouseUp={(e) => captureQuoteSelection(quote)}
+                  >
                     {quote.answer}
                   </Text>
                 </VStack>
