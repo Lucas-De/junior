@@ -1,8 +1,9 @@
-import { fetchBookmarks } from "@/utils/api";
+import { fetchBookmarks, fetchBookmarksSummary } from "@/utils/api";
 import {
   Box,
   Button,
   Flex,
+  IconButton,
   Input,
   Modal,
   ModalCloseButton,
@@ -18,6 +19,9 @@ import BookmarkDirectoryListItem from "./BookmarkDirectoryListItem";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import { ChangeEvent, useCallback, useState } from "react";
 import _ from "lodash";
+import { BsStars } from "react-icons/bs";
+import SummaryTooltip from "./AiSummaryButton";
+import AiSummaryButton from "./AiSummaryButton";
 
 interface Props {
   transcriptId: string;
@@ -70,7 +74,10 @@ export default function BookmarkModal(props: Props) {
       <ModalContent>
         <ModalHeader>
           <div>Bookmarks</div>
-          <Input placeholder="Search" mt={4} onChange={debounceSearch} />
+          <Flex justify="center" align="center" h="100%" gap={2} mt={4}>
+            <Input placeholder="Search" onChange={debounceSearch} />
+            <AiSummaryButton transcriptId={+props.transcriptId} />
+          </Flex>
         </ModalHeader>
         <ModalCloseButton />
         <Box display="block" overflowY="scroll" h={400} px={6} pb={6}>

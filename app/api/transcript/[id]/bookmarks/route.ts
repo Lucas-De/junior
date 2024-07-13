@@ -4,9 +4,6 @@ import z, { ZodError } from "zod";
 import { createBookmark } from "./service";
 import { BookmarkDirectory } from "@/utils/types";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 interface GetBookmarkParams {
   params: {
     id: string;
@@ -32,8 +29,6 @@ export async function GET(req: NextRequest, { params }: GetBookmarkParams) {
         LEFT JOIN transcript_question_answer qa ON qa.id = b.transcript_question_answer_id
         WHERE qa.transcript_id = ${transcriptId} and b.text ILIKE ${likeString};
     `;
-
-  console.log(rows);
 
   const directories: Record<number, BookmarkDirectory> = {};
   rows.forEach((row) => {
@@ -102,7 +97,6 @@ export async function POST(req: NextRequest) {
     client.sql`COMMIT`;
     return NextResponse.json({}, { status: 201 });
   } catch (e) {
-    console.log(e);
     client.sql`ROLLBACK`;
     return NextResponse.json({}, { status: 500 });
   }

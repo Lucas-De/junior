@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BookmarkDirectory } from "./types";
+import { BookmarkDirectory, BookmarkSummary } from "./types";
 
 const api = axios.create({
   baseURL: "/api",
@@ -22,6 +22,13 @@ export const addBookmark = async (
     directoryId: directory.id,
     newDirectoryName: directory.newName,
   });
+  return response.data;
+};
+
+export const fetchBookmarksSummary = async (
+  id: number
+): Promise<BookmarkSummary> => {
+  const response = await api.get(`/transcript/${id}/bookmarks/summary`);
   return response.data;
 };
 

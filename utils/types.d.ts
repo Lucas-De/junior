@@ -1,3 +1,7 @@
+export interface BookmarkSummary {
+  summary: string;
+}
+
 export interface BookmarkDirectory {
   id: string;
   name: string;
