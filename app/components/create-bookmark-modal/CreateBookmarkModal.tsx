@@ -28,6 +28,8 @@ export default function CreateBookmarkModal({ text, quote, onClose }: Props) {
   const [newFolderName, setNewFolderName] = useState("");
   const [selectedDirectoryId, setSelectedDirectoryId] = useState<number>();
 
+  const isValidInput = isNewFolder ? newFolderName.length : selectedDirectoryId;
+
   const { mutate: save, isPending: isSaving } = useMutation({
     mutationFn: async () => {
       const dir = isNewFolder
@@ -57,6 +59,7 @@ export default function CreateBookmarkModal({ text, quote, onClose }: Props) {
               autoFocus
               placeholder="New Folder"
               size="sm"
+              value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
             />
           ) : (
@@ -65,6 +68,7 @@ export default function CreateBookmarkModal({ text, quote, onClose }: Props) {
               isRequired
               size="sm"
               icon={isLoading ? <Spinner /> : undefined}
+              value={selectedDirectoryId}
               onChange={(e) => setSelectedDirectoryId(+e.target.value)}
             >
               {directories?.map((d) => (
@@ -88,6 +92,7 @@ export default function CreateBookmarkModal({ text, quote, onClose }: Props) {
               size="sm"
               colorScheme="blue"
               isLoading={isSaving}
+              isDisabled={!isValidInput}
               onClick={() => save()}
             >
               Save
