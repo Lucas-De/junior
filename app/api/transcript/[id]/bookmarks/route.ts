@@ -45,6 +45,9 @@ interface GetBookmarkParams {
 
 export async function GET(req: NextRequest, { params }: GetBookmarkParams) {
   const { id: transcriptId } = params;
+  const searchParams = req.nextUrl.searchParams;
+  const searchQuery = searchParams.get("search") ?? "";
+  const likeString = `%${searchQuery}%`;
 
   const client = await db.connect();
   const { rows } = await client.sql`
@@ -57,14 +60,11 @@ export async function GET(req: NextRequest, { params }: GetBookmarkParams) {
         FROM bookmark b
         LEFT JOIN bookmark_directory d ON d.id = b.bookmark_directory_id
         LEFT JOIN transcript_question_answer qa ON qa.id = b.transcript_question_answer_id
-        WHERE qa.transcript_id = ${transcriptId}
+        WHERE qa.transcript_id = ${transcriptId} and b.quote LIKE ${likeString};
     `;
-
-  console.log(rows);
 
   const directories: Record<number, BookmarkDirectory> = {};
   rows.forEach((row) => {
-    console.log(row);
     if (!directories[row.dir_id]) {
       directories[row.dir_id] = {
         id: row.dir_id,

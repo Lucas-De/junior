@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  Input,
   Modal,
   ModalCloseButton,
   ModalContent,
@@ -15,6 +16,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import BookmarkDirectoryListItem from "./BookmarkDirectoryListItem";
 import { mkConfig, generateCsv, download } from "export-to-csv";
+import { ChangeEvent, useCallback, useState } from "react";
+import _ from "lodash";
 
 interface Props {
   transcriptId: string;
@@ -22,10 +25,19 @@ interface Props {
 }
 
 export default function BookmarkModal(props: Props) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const debounceSearch = useCallback(
+    _.debounce((e: ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    }, 1000),
+    []
+  );
+
   const { data: directories, isLoading } = useQuery({
-    queryKey: ["bookmarks", props.transcriptId],
-    queryFn: () => fetchBookmarks(props.transcriptId),
-    staleTime: 0,
+    queryKey: ["bookmarks", props.transcriptId, searchQuery],
+    queryFn: () => fetchBookmarks(props.transcriptId, searchQuery),
+    staleTime: 1000 * 50,
     retry: false,
   });
 
@@ -56,7 +68,10 @@ export default function BookmarkModal(props: Props) {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Bookmarks</ModalHeader>
+        <ModalHeader>
+          <div>Bookmarks</div>
+          <Input placeholder="Search" mt={4} onChange={debounceSearch} />
+        </ModalHeader>
         <ModalCloseButton />
         <Box display="block" overflowY="scroll" h={400} px={6} pb={6}>
           {isLoading && (

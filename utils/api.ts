@@ -16,8 +16,11 @@ export const addBookmark = async (id: string, quote: string) => {
 };
 
 export const fetchBookmarks = async (
-  id: string
+  id: string,
+  search: string
 ): Promise<BookmarkDirectory[]> => {
-  const response = await api.get(`/transcript/${id}/bookmarks`);
+  const response = await api.get(`/transcript/${id}/bookmarks`, {
+    params: { search },
+  });
   return response.data;
 };
