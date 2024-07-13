@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
+import { BookmarkDirectory } from "./types";
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: "/api",
 });
 
 export const fetchTranscript = async () => {
@@ -14,7 +15,9 @@ export const addBookmark = async (id: string, quote: string) => {
   return response.data;
 };
 
-export const fetchBookmarks = async (id: string) => {
+export const fetchBookmarks = async (
+  id: string
+): Promise<BookmarkDirectory[]> => {
   const response = await api.get(`/transcript/${id}/bookmarks`);
   return response.data;
 };

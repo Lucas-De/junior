@@ -1,17 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Box, HStack, Heading, Link, Text, VStack } from '@chakra-ui/react';
-// import BookmarkForm from '@/components/BookmarkForm';
-// import BookmarkList from '@/components/BookmarkList';
-import { fetchTranscript, addBookmark, fetchBookmarks } from '@/utils/api';
-import { Transcript, TranscriptQA, TranscriptWithQA } from '@/utils/types';
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Heading,
+  Link,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { fetchTranscript } from "@/utils/api";
+import { TranscriptWithQA } from "@/utils/types";
+import { BsBookmark } from "react-icons/bs";
+import BookmarkModal from "./components/BookmarkModal";
 
 const Home = () => {
   const [transcripts, setTranscripts] = useState<TranscriptWithQA[] | null>(
     null
   );
   const [loading, setLoading] = useState(false);
+  const [bookmarkModalId, setBookmarkModalId] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -42,7 +52,7 @@ const Home = () => {
               key={transcript.id}
               href={`#${transcript.id}`}
               borderRadius="md"
-              _hover={{ bg: 'teal.100' }}
+              _hover={{ bg: "teal.100" }}
             >
               <Text fontSize="sm">{transcript.interview_name}</Text>
             </Link>
@@ -60,6 +70,13 @@ const Home = () => {
         boxShadow="lg"
         w="full"
       >
+        {bookmarkModalId && (
+          <BookmarkModal
+            transcriptId={bookmarkModalId}
+            onClose={() => setBookmarkModalId(null)}
+          />
+        )}
+
         {loading && <Box>Loading...</Box>}
         {transcripts?.map(({ transcript, quotes }) => (
           <Box
@@ -77,9 +94,19 @@ const Home = () => {
               {transcript.interview_name}
             </Text>
 
-            <Heading size="md" mb={4} color="teal.600">
-              Quotes
-            </Heading>
+            <Flex gap={4} mb={4} align="center">
+              <Heading size="md" color="teal.600">
+                Quotes
+              </Heading>
+              <Button
+                variant="ghost"
+                size="xs"
+                leftIcon={<BsBookmark />}
+                onClick={() => setBookmarkModalId(transcript.id)}
+              >
+                View Bookmarks
+              </Button>
+            </Flex>
 
             <VStack align="stretch" spacing={6}>
               {quotes?.map((quote) => (

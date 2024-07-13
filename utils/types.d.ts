@@ -1,3 +1,15 @@
+export interface BookmarkDirectory {
+  id: string;
+  name: string;
+  bookmarks: Bookmark[];
+}
+
+export interface Bookmark {
+  id: string;
+  quote: string;
+  question: string;
+}
+
 export interface Transcript {
   id: string;
   interview_name: string;

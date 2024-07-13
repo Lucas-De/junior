@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db, sql } from '@vercel/postgres';
-import { faker } from '@faker-js/faker';
-import { Transcript } from '@/utils/types';
+import { NextRequest, NextResponse } from "next/server";
+import { db, sql } from "@vercel/postgres";
+import { faker } from "@faker-js/faker";
+import { Transcript } from "@/utils/types";
 
 const seedDb = async ({ reset = false }: { reset?: boolean }) => {
-  console.log('Creating tables');
+  console.log("Creating tables");
 
   if (reset) {
-    console.log('Resetting database');
-    await sql`DROP TABLE IF EXISTS bookmark_transcript_question_answer`;
+    console.log("Resetting database");
+    await sql`DROP TABLE IF EXISTS bookmark`;
+    await sql`DROP TABLE IF EXISTS bookmark_dir`;
     await sql`DROP TABLE IF EXISTS transcript_question_answer`;
     await sql`DROP TABLE IF EXISTS transcript`;
-    await sql`DROP TABLE IF EXISTS bookmark`;
 
     // Create tables
     await sql`
@@ -30,27 +30,28 @@ const seedDb = async ({ reset = false }: { reset?: boolean }) => {
       );`;
 
     await sql`
-      CREATE TABLE bookmark (
+      CREATE TABLE bookmark_directory (
         id SERIAL PRIMARY KEY,
         name TEXT
       );`;
 
     await sql`
-      CREATE TABLE bookmark_transcript_question_answer (
+      CREATE TABLE bookmark (
         id SERIAL PRIMARY KEY,
-        bookmark_id INTEGER,
         transcript_question_answer_id INTEGER,
-        FOREIGN KEY(bookmark_id) REFERENCES bookmark(id) ON DELETE CASCADE,
-        FOREIGN KEY(transcript_question_answer_id) REFERENCES transcript_question_answer(id) ON DELETE CASCADE
+        bookmark_directory_id INTEGER,
+        quote TEXT,
+        FOREIGN KEY(transcript_question_answer_id) REFERENCES transcript_question_answer(id) ON DELETE CASCADE,
+        FOREIGN KEY(bookmark_directory_id) REFERENCES bookmark_directory(id)
       );`;
   }
 
-  console.log('Seeding data');
+  console.log("Seeding data");
 
   // Seed 5 transcripts
   const transcripts = Array.from({ length: 5 }, () => faker.person.fullName());
 
-  console.log('transcripts', transcripts);
+  console.log("transcripts", transcripts);
 
   const createdTs = await Promise.all(
     transcripts.map(
@@ -65,7 +66,7 @@ const seedDb = async ({ reset = false }: { reset?: boolean }) => {
     const transcriptId = transcript.id;
 
     return Array.from({ length: 20 }, () => {
-      const question = faker.lorem.sentence() + '?';
+      const question = faker.lorem.sentence() + "?";
       const answer = faker.lorem.paragraph();
       return [transcriptId, question, answer];
     });
@@ -78,16 +79,16 @@ const seedDb = async ({ reset = false }: { reset?: boolean }) => {
     )
   );
 
-  console.log('created question-answer rows:', qaRows);
+  console.log("created question-answer rows:", qaRows);
 };
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const reset = searchParams.get('reset');
+  const reset = searchParams.get("reset");
 
   try {
     await sql`BEGIN`;
-    await seedDb({ reset: reset === 'true' });
+    await seedDb({ reset: reset === "true" });
     await sql`COMMIT`;
   } catch (error) {
     console.error(error);
